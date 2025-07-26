@@ -5,6 +5,19 @@ export const createPrice = async (req: Request, res: Response) => {
   try {
     const { productId, marketId, date, minPrice, maxPrice } = req.body;
 
+    // Check if the combination already exists
+    const existingPrice = await Price.findOne({
+      productId,
+      marketId,
+      date: new Date(date), // Ensure date is compared correctly
+    });
+
+    if (existingPrice) {
+      return res.status(409).json({
+        error: 'A price entry for this product, market, and date already exists.',
+      });
+    }
+
     const newPrice = await Price.create({ productId, marketId, date, minPrice, maxPrice });
 
     res.status(201).json(newPrice);

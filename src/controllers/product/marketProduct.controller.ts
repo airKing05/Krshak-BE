@@ -7,6 +7,14 @@ import mongoose from "mongoose";
 
 export const linkMarketProduct = async (req: Request, res: Response) => {
   try {
+    const {marketId, categoryId, productId} = req.body;
+
+    const existingMarketProductLink = await MarketProduct.findOne({ marketId, categoryId, productId });
+
+    if(existingMarketProductLink){
+      return res.status(409).json({ message: "The link of marketId & categoryId & productId is already exist" });
+    }
+    
     const entry = new MarketProduct(req.body);
     const saved = await entry.save();
     res.status(201).json(saved);
