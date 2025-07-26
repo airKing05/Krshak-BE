@@ -34,5 +34,6 @@ router.get('/market-categories/:marketId/categories', marketCategoryCtrl.getCate
 router.post("/market-products", marketProductCtrl.linkMarketProduct);
 router.get("/market-products", marketProductCtrl.getMarketProducts);
 router.get('/market-products/:marketId', marketProductCtrl.getProductsByMarketAndCategory); // list of products of selected marketId & productId
+router.get("/market-products/:marketId/product/:productId", marketProductCtrl.getSingleProductDetail); // get full details of product with price history by marketId and productId
 
 export default router;
