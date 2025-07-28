@@ -40,7 +40,7 @@ export const getMarketProducts = async (_req: Request, res: Response) => {
 export const getProductsByMarketAndCategory = async (req, res) => {
   try {
     const { marketId } = req.params;
-    const { categoryId } = req.query;
+    const { categoryId, product="" } = req.query;
 
     if (!marketId || !mongoose.Types.ObjectId.isValid(marketId)) {
       return res.status(400).json({ message: "Valid marketId is required" });
@@ -50,7 +50,7 @@ export const getProductsByMarketAndCategory = async (req, res) => {
       marketId: new mongoose.Types.ObjectId(marketId),
     };
 
-    if (categoryId && mongoose.Types.ObjectId.isValid(categoryId)) {
+    if (categoryId != 'all' && categoryId && mongoose.Types.ObjectId.isValid(categoryId)) {
       matchStage.categoryId = new mongoose.Types.ObjectId(categoryId);
     }
 
@@ -67,6 +67,19 @@ export const getProductsByMarketAndCategory = async (req, res) => {
         }
       },
       { $unwind: "$product" },
+
+      // Optional product name filter (after joining with products)
+      ...(product
+      ? [
+          {
+            $match: {
+              "product.name": {
+                $regex: new RegExp(product.trim(), 'i'), // Case-insensitive match
+              },
+            },
+          },
+        ]
+      : []),
 
       // Join with Category
       {
