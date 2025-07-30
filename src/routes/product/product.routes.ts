@@ -5,6 +5,8 @@ import * as productCtrl from "../../controllers/product/product.controller";
 import * as marketCategoryCtrl from "../../controllers/product/marketCategory.controller";
 import * as marketProductCtrl from "../../controllers/product/marketProduct.controller";
 import * as priceCtrl from "../../controllers/product/price.controller";
+import * as comparePriceCtrl from "../../controllers/product/comparePrices.controller";
+
 
 
 const router = express.Router();
@@ -35,5 +37,8 @@ router.post("/market-products", marketProductCtrl.linkMarketProduct);
 router.get("/market-products", marketProductCtrl.getMarketProducts);
 router.get('/market-products/:marketId', marketProductCtrl.getProductsByMarketAndCategory); // list of products of selected marketId & productId
 router.get("/market-products/:marketId/product/:productId", marketProductCtrl.getSingleProductDetail); // get full details of product with price history by marketId and productId
+
+//priceComparisonRoutes.js
+router.get("/compare-price", comparePriceCtrl.comparePrices);
 
 export default router;
