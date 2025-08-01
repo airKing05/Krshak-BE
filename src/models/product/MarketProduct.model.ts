@@ -9,4 +9,5 @@ const marketProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("MarketProduct", marketProductSchema);
+export default mongoose.model("MarketProduct", marketProductSchema);
+ 

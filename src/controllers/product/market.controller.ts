@@ -28,7 +28,11 @@ export const createMarket = async (req: Request, res: Response) => {
     const saved = await market.save();
     res.status(201).json(saved);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(400).json({ error: "Unknown error" });
+    }
   }
 };
 
@@ -38,7 +42,11 @@ export const getAllMarkets = async (_req: Request, res: Response) => {
     const markets = await Market.find();
     res.json(markets);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Unknown error" });
+    }
   }
 };
 

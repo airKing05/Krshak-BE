@@ -41,14 +41,14 @@ export const comparePrices = async (req: Request, res: Response) => {
       ...query,
       marketId: market1Id
     })
-      .populate<{ productId: IProduct }>("productId")
+      .populate("productId")
       .lean();
 
     const market2Products = await MarketProduct.find({
       ...query,
       marketId: market2Id
     })
-      .populate<{ productId: IProduct }>("productId")
+      .populate("productId")
       .lean();
 
     const productsMap: Record<string, ProductCompare> = {};
@@ -122,9 +122,13 @@ export const comparePrices = async (req: Request, res: Response) => {
     }
 
     res.json(Object.values(productsMap));
-  } catch (error) {
-    console.error("Error in comparePrices:", error.message, error.stack);
-    res.status(500).json({ message: "Internal server error." });
+  } catch (err) {
+    console.error("Error in comparePrices:", err);
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal server error." });
+    }
   }
 };
  

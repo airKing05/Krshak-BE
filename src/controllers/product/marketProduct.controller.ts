@@ -3,6 +3,7 @@ import MarketProduct from "../../models/product/MarketProduct.model";
 import Product from "../../models/product/product.model";
 import Price from '../../models/product/Price.model';
 import mongoose from "mongoose";
+import { PopulatedProduct, QueryParams } from "../../types/common";
 
 
 export const linkMarketProduct = async (req: Request, res: Response) => {
@@ -19,7 +20,11 @@ export const linkMarketProduct = async (req: Request, res: Response) => {
     const saved = await entry.save();
     res.status(201).json(saved);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(400).json({ error: "Unknown error" });
+    }
   }
 };
 
@@ -30,23 +35,34 @@ export const getMarketProducts = async (_req: Request, res: Response) => {
       .populate("productId");
     res.json(data);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Unknown error" });
+    }
   }
 };
 
 
 // search controller for products
 // based on categoryId
-export const getProductsByMarketAndCategory = async (req, res) => {
+export const getProductsByMarketAndCategory = async (req: Request, res: Response)  => {
   try {
     const { marketId } = req.params;
-    const { categoryId, product="" } = req.query;
+    const { product="" } = req.query;
+    const rawCategoryId = req.query.categoryId;
+
+
+    const productSearchTerm = typeof product === "string" ? product.trim() : ""; 
+    
+    const categoryId = typeof rawCategoryId === "string" ? rawCategoryId : null;
+
 
     if (!marketId || !mongoose.Types.ObjectId.isValid(marketId)) {
       return res.status(400).json({ message: "Valid marketId is required" });
     }
 
-    const matchStage = {
+    const matchStage: Record<string, any> = {
       marketId: new mongoose.Types.ObjectId(marketId),
     };
 
@@ -69,12 +85,12 @@ export const getProductsByMarketAndCategory = async (req, res) => {
       { $unwind: "$product" },
 
       // Optional product name filter (after joining with products)
-      ...(product
+      ...(productSearchTerm
       ? [
           {
             $match: {
               "product.name": {
-                $regex: new RegExp(product.trim(), 'i'), // Case-insensitive match
+                $regex: new RegExp(productSearchTerm.trim(), 'i'), // Case-insensitive match
               },
             },
           },
@@ -136,24 +152,30 @@ export const getProductsByMarketAndCategory = async (req, res) => {
 
   } catch (err) {
     console.error("Error fetching products:", err);
-    res.status(500).json({ message: "Failed to get market products", error: err.message });
+    // res.status(500).json({ message: "Failed to get market products", error: err.message });
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Failed to get market products" });
+    }
   }
 };
 
 
 
 // single product details with price and category by productId and marketId
-export const getSingleProductDetail = async (req, res) => {
+export const getSingleProductDetail = async (req: Request, res: Response)  => {
   try {
     const { marketId, productId } = req.params;
-    const { days = 6 } = req.query; // fallback to 30 if not provided
+
+    const { days = '6' } = req.query as QueryParams;
+    const parsedDays = parseInt(days); // fallback to 30 if not provided
 
     // Validate inputs
     if (!mongoose.Types.ObjectId.isValid(marketId) || !mongoose.Types.ObjectId.isValid(productId)) {
       return res.status(400).json({ message: "Invalid marketId or productId" });
     }
 
-    const parsedDays = parseInt(days);
     if (isNaN(parsedDays) || parsedDays < 1 || parsedDays > 90) {
       return res.status(400).json({ message: "Query param 'days' must be a number between 1 and 90" });
     }
@@ -163,11 +185,11 @@ export const getSingleProductDetail = async (req, res) => {
     if (!marketProduct) {
       return res.status(404).json({ message: "Product not found in the specified market." });
     }
-
+ 
     // 2. Fetch product with category
     const product = await Product.findById(productId)
       .populate("categoryId", "name")
-      .lean();
+      .lean<PopulatedProduct>();
 
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
@@ -198,8 +220,12 @@ export const getSingleProductDetail = async (req, res) => {
       price: priceHistory
     });
 
-  } catch (error) {
-    console.error("getSingleProductDetail error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+  } catch (err) {
+    console.error("getSingleProductDetail error:", err);
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 };

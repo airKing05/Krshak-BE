@@ -31,7 +31,11 @@ export const createProduct = async (req: Request, res: Response) => {
     res.status(201).json(saved);
 
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 };
 
@@ -40,6 +44,10 @@ export const getAllProducts = async (_req: Request, res: Response) => {
     const products = await Product.find().populate("categoryId");
     res.json(products);
   } catch (err) {
+   if (err instanceof Error) {
     res.status(500).json({ error: err.message });
+  } else {
+    res.status(500).json({ error: "Unknown error occurred" });
+  }
   }
 };

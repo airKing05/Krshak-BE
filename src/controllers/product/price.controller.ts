@@ -22,7 +22,11 @@ export const createPrice = async (req: Request, res: Response) => {
 
     res.status(201).json(newPrice);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to create price entry', message: err });
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Failed to create price entry" });
+    }
   }
 };
 
@@ -32,6 +36,10 @@ export const getPricesByProduct = async (req: Request, res: Response) => {
     const prices = await Price.find({ productId }).sort({ date: -1 });
     res.json(prices);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to get prices', message: err });
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 };

@@ -19,7 +19,11 @@ export const linkMarketCategory = async (req: Request, res: Response) => {
     const saved = await entry.save();
     res.status(201).json(saved);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    if (err instanceof Error) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(400).json({ error: "Internal server error" });
+    }
   }
 };
 
@@ -30,7 +34,11 @@ export const getMarketCategories = async (_req: Request, res: Response) => {
       .populate("categoryId");
     res.json(data);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 };
 
@@ -77,8 +85,12 @@ export const getCategoriesByMarketId = async (req: Request, res: Response) => {
   res.json(result);
 
     
-  } catch (error) {
-    console.error('Error fetching market categories:', error);
-    res.status(500).json({ message: 'Server error' });
+  } catch (err) {
+    console.error('Error fetching market categories:', err);
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Error fetching market categories" });
+    }
   }
 };
