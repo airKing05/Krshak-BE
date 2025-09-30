@@ -12,6 +12,8 @@ const MarketSchema: Schema = new Schema(
     city: { type: String, required: true },
     district: { type: String, required: true },
     state: { type: String, required: true },
+    lat: { type: Number, required: true},
+    lng: { type: Number, required: true},
   },
   { timestamps: true }
 );

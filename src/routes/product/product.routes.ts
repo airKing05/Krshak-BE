@@ -14,6 +14,8 @@ const router = express.Router();
 // Markets
 router.post("/markets", marketCtrl.createMarket);
 router.get("/markets", marketCtrl.getAllMarkets);
+router.get("/markets/:marketId", marketCtrl.getMarketByMarketId);
+
 
 // Categories
 router.post("/categories", categoryCtrl.createCategory);
