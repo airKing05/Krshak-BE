@@ -26,11 +26,11 @@ const ProductSchema: Schema = new Schema(
         {
           validator: function (value: string[]) {
             return value.every((url) =>
-              /^(https?:\/\/.*\.(?:png|jpg|jpeg|webp|gif|svg))$/i.test(url)
+              /^(https?:\/\/[^\s]+)$/.test(url)
             );
           },
-          message: 'Each image must be a valid image URL.',
-        },
+          message: 'Each image must be a valid URL.',
+        }
       ],
       default: [],
     },

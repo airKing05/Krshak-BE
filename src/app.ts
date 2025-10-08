@@ -8,12 +8,20 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors(
-    {
-        origin: 'http://localhost:5173', 
-        credentials: true
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'https://krshak-fe.vercel.app'
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-));
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 app.use("/api/v1", productRouter);

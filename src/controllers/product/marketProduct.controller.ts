@@ -133,6 +133,9 @@ export const getProductsByMarketAndCategory = async (req: Request, res: Response
         $project: {
           _id: "$product._id",
           name: "$product.name",
+          imgUrl: {
+            $arrayElemAt: ["$product.images", 0],
+          },
           marketId: 1,
           category: {
             _id: "$category._id",

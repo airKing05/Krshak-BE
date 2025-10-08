@@ -12,6 +12,8 @@ interface ProductCompare {
   market2: { minPrice: number; maxPrice: number } | null;
 }
 
+// TODO: login not working properly
+// maybe after applying filter changes
 export const comparePrices = async (req: Request, res: Response) => {
   try {
     const { market1Id, market2Id, categoryId, date } = req.query as {
