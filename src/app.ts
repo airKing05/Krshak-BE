@@ -12,7 +12,7 @@ app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = [
       'https://krshak-fe.vercel.app',
-      'http://192.168.43.83:5001/api/v1',
+      'http://192.168.43.83:5001',
       'http://localhost:5173'
     ];
     if (!origin || allowedOrigins.includes(origin)) {

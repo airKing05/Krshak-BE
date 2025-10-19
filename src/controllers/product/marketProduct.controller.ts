@@ -232,3 +232,39 @@ export const getSingleProductDetail = async (req: Request, res: Response)  => {
     }
   }
 };
+
+
+
+// delete market-product, based on marketId productId
+export const deleteMarketProduct = async (req: Request, res: Response) => {
+  const { marketId, productId } = req.params;
+  try {
+    // First, delete the MarketProduct document
+    const deletedMarketProduct = await MarketProduct.findOneAndDelete({
+      marketId,
+      productId,
+    });
+
+    if (!deletedMarketProduct) {
+      return res.status(404).json({ message: "MarketProduct not found." });
+    }
+
+    // Then, delete all Price entries related to this market/product
+    const deletedPrices = await Price.deleteMany({
+      marketId,
+      productId,
+    });
+
+    res.status(200).json({
+      message: "MarketProduct and related price entries deleted successfully.",
+      deletedPricesCount: deletedPrices.deletedCount,
+    });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Unknown error occurred" });
+    }
+  }
+};
+
